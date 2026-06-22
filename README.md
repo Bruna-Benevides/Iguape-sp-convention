@@ -44,3 +44,62 @@ You don’t have to ever use `eject`. The curated feature set is suitable for sm
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
 To learn React, check out the [React documentation](https://reactjs.org/).
+
+## Depoimentos
+
+Funcionalidade de depoimentos removida — o projeto agora funciona sem backend.
+
+## Deploy no Vercel
+
+Passos básicos para publicar no Vercel:
+
+1. Faça commit e push do seu repositório para GitHub/GitLab/Bitbucket.
+2. No Vercel, importe o repositório e crie um novo projeto.
+3. Adicione as variáveis de ambiente listadas acima em Settings → Environment Variables.
+4. O Vercel executará `npm run build` automaticamente e publicará o site.
+
+Se preferir, você também pode servir o build localmente para testar:
+
+```bash
+npm run build
+npx serve -s build
+```
+
+### Deploy automático via GitHub Actions → Vercel
+
+Você pode automatizar deploys configurando o GitHub Actions (pipeline já incluído em `.github/workflows/deploy-vercel.yml`). Para usar it:
+
+1. No Vercel, gere um token de deploy (Settings → Tokens).
+2. No repositório GitHub, vá em Settings → Secrets and variables → Actions e adicione os seguintes *secrets*:
+	- `VERCEL_TOKEN` — token gerado no Vercel
+	- `VERCEL_ORG_ID` — opcional, fornecido pelo Vercel (ajuda a garantir deploy ao projeto correto)
+	- `VERCEL_PROJECT_ID` — opcional, fornece identificação do projeto no Vercel
+3. Faça push para a branch `main` — o workflow irá construir e executar `npx vercel --prod` automaticamente.
+
+Observação: se preferir não usar `VERCEL_ORG_ID`/`VERCEL_PROJECT_ID`, geralmente apenas `VERCEL_TOKEN` é suficiente quando o projeto já está ligado à conta Vercel.
+
+## Deploy via CLI (alternativa)
+
+Se preferir usar o CLI do Vercel localmente em vez do workflow, há scripts auxiliares em `scripts/`:
+
+- `scripts/deploy_vercel.sh`: faz `npx vercel --prod` usando a variável `VERCEL_TOKEN`.
+- `scripts/set_vercel_env.sh`: lê um `.env.local` e tenta adicionar as variáveis ao Vercel via `npx vercel env add` (requer `VERCEL_TOKEN`).
+
+Exemplo local:
+
+```bash
+export VERCEL_TOKEN=seu_token_aqui
+./scripts/set_vercel_env.sh .env.local
+./scripts/deploy_vercel.sh
+```
+
+Nota: esses scripts chamam `npx vercel` — você será autenticado pelo token e o projeto deve já estar vinculado à conta Vercel.
+
+## Teste local em tempo real (sem Firebase)
+
+Para facilitar desenvolvimento local sem o Firestore, o app implementa um fallback com `BroadcastChannel` que sincroniza novos depoimentos entre abas do navegador. Isso significa que:
+
+- Se o Firestore não estiver configurado, ao enviar um novo depoimento em uma aba, outras abas abertas na mesma máquina também receberão o depoimento automaticamente (simulação em tempo real).
+- Se o navegador não suportar `BroadcastChannel`, o fallback continua sendo `localStorage` e será necessário recarregar para ver atualizações.
+
+
