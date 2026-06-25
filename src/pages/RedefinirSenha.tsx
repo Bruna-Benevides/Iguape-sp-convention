@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../services/supabase";
 
@@ -8,8 +8,49 @@ export default function RedefinirSenha() {
     const [novaSenha, setNovaSenha] = useState("");
     const [mensagem, setMensagem] = useState("");
     const [carregando, setCarregando] = useState(false);
+    const [verificando, setVerificando] = useState(true);
+    const [podeRedefinir, setPodeRedefinir] = useState(false);
+
+    useEffect(() => {
+        async function verificarSessao() {
+            const {
+                data: { session },
+            } = await supabase.auth.getSession();
+
+            if (session) {
+                setPodeRedefinir(true);
+            } else {
+                setMensagem(
+                    "Link de recuperação inválido ou expirado. Solicite um novo email de recuperação."
+                );
+            }
+
+            setVerificando(false);
+        }
+
+        const {
+            data: { subscription },
+        } = supabase.auth.onAuthStateChange((event, session) => {
+            if (event === "PASSWORD_RECOVERY" || session) {
+                setPodeRedefinir(true);
+                setMensagem("");
+                setVerificando(false);
+            }
+        });
+
+        verificarSessao();
+
+        return () => subscription.unsubscribe();
+    }, []);
 
     async function alterarSenha() {
+        if (!podeRedefinir) {
+            setMensagem(
+                "Abra esta página pelo link enviado no email de recuperação."
+            );
+            return;
+        }
+
         if (novaSenha.length < 6) {
             setMensagem("A senha precisa ter pelo menos 6 caracteres.");
             return;
@@ -25,7 +66,9 @@ export default function RedefinirSenha() {
         setCarregando(false);
 
         if (error) {
-            setMensagem(error.message);
+            setMensagem(
+                "Não foi possível alterar a senha. Solicite um novo email de recuperação e tente novamente."
+            );
             return;
         }
 
@@ -41,15 +84,27 @@ export default function RedefinirSenha() {
             <div style={styles.card}>
                 <h1 style={styles.titulo}>Redefinir senha</h1>
 
+                {verificando && (
+                    <p style={styles.mensagem}>Verificando link de recuperação...</p>
+                )}
+
                 <input
                     type="password"
                     placeholder="Nova senha"
                     value={novaSenha}
                     onChange={(e) => setNovaSenha(e.target.value)}
                     style={styles.input}
+                    disabled={verificando || !podeRedefinir || carregando}
                 />
 
-                <button onClick={alterarSenha} style={styles.botao}>
+                <button
+                    onClick={alterarSenha}
+                    style={{
+                        ...styles.botao,
+                        opacity: verificando || !podeRedefinir ? 0.6 : 1,
+                    }}
+                    disabled={verificando || !podeRedefinir || carregando}
+                >
                     {carregando ? "Salvando..." : "Salvar nova senha"}
                 </button>
 
