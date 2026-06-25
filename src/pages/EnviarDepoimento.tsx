@@ -11,6 +11,8 @@ export default function EnviarDepoimento() {
 
     const [mensagem, setMensagem] = useState("");
     const [carregando, setCarregando] = useState(false);
+    const fotosInputId = "fotos-depoimento";
+    const videosInputId = "videos-depoimento";
 
     async function enviarDepoimento() {
         try {
@@ -97,6 +99,24 @@ export default function EnviarDepoimento() {
         return urls;
     }
 
+    function adicionarFotos(arquivos: FileList | null) {
+        if (!arquivos) return;
+        setFotos((atuais) => [...atuais, ...Array.from(arquivos)]);
+    }
+
+    function adicionarVideos(arquivos: FileList | null) {
+        if (!arquivos) return;
+        setVideos((atuais) => [...atuais, ...Array.from(arquivos)]);
+    }
+
+    function removerFoto(index: number) {
+        setFotos((atuais) => atuais.filter((_, itemIndex) => itemIndex !== index));
+    }
+
+    function removerVideo(index: number) {
+        setVideos((atuais) => atuais.filter((_, itemIndex) => itemIndex !== index));
+    }
+
     return (
         <div
             style={{
@@ -150,39 +170,79 @@ export default function EnviarDepoimento() {
                     }}
                 />
 
-                <div style={{ marginBottom: "15px" }}>
-                    <label>
-                        <strong>Enviar fotos:</strong>
+                <div style={uploadGroupStyle}>
+                    <label htmlFor={fotosInputId} style={uploadButtonStyle}>
+                        Escolher fotos
                     </label>
 
                     <input
+                        id={fotosInputId}
                         type="file"
                         accept="image/*"
                         multiple
+                        style={hiddenFileInputStyle}
                         onChange={(e) =>
-                            setFotos(Array.from(e.target.files || []))
+                            adicionarFotos(e.target.files)
                         }
                     />
+                    <p style={uploadHintStyle}>
+                        {fotos.length === 0
+                            ? "Nenhuma foto selecionada"
+                            : `${fotos.length} foto(s) selecionada(s)`}
+                    </p>
                     {fotos.length > 0 && (
-                        <p style={fileInfoStyle}>{fotos.length} foto(s) selecionada(s)</p>
+                        <div style={fileListStyle}>
+                            {fotos.map((foto, index) => (
+                                <div key={`${foto.name}-${index}`} style={fileItemStyle}>
+                                    <span>{foto.name}</span>
+                                    <button
+                                        type="button"
+                                        onClick={() => removerFoto(index)}
+                                        style={removeFileButtonStyle}
+                                    >
+                                        Remover
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
                     )}
                 </div>
 
-                <div style={{ marginBottom: "25px" }}>
-                    <label>
-                        <strong>Enviar vídeos:</strong>
+                <div style={uploadGroupStyle}>
+                    <label htmlFor={videosInputId} style={uploadButtonStyle}>
+                        Escolher vídeos
                     </label>
 
                     <input
+                        id={videosInputId}
                         type="file"
                         accept="video/*"
                         multiple
+                        style={hiddenFileInputStyle}
                         onChange={(e) =>
-                            setVideos(Array.from(e.target.files || []))
+                            adicionarVideos(e.target.files)
                         }
                     />
+                    <p style={uploadHintStyle}>
+                        {videos.length === 0
+                            ? "Nenhum vídeo selecionado"
+                            : `${videos.length} vídeo(s) selecionado(s)`}
+                    </p>
                     {videos.length > 0 && (
-                        <p style={fileInfoStyle}>{videos.length} vídeo(s) selecionado(s)</p>
+                        <div style={fileListStyle}>
+                            {videos.map((video, index) => (
+                                <div key={`${video.name}-${index}`} style={fileItemStyle}>
+                                    <span>{video.name}</span>
+                                    <button
+                                        type="button"
+                                        onClick={() => removerVideo(index)}
+                                        style={removeFileButtonStyle}
+                                    >
+                                        Remover
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
                     )}
                 </div>
 
@@ -202,7 +262,7 @@ export default function EnviarDepoimento() {
                 >
                     {carregando
                         ? "Enviando..."
-                        : "Enviar Depoimento"}
+                        : "Enviar"}
                 </button>
 
                 {mensagem && (
@@ -230,9 +290,57 @@ const inputStyle = {
     boxSizing: "border-box" as const,
 };
 
-const fileInfoStyle = {
+const uploadGroupStyle = {
+    marginBottom: "25px",
+};
+
+const uploadButtonStyle = {
+    display: "inline-block",
+    padding: "12px 18px",
+    background: "#a3b18a",
+    color: "#0c3d2e",
+    border: "none",
+    borderRadius: "8px",
+    cursor: "pointer",
+    fontWeight: "bold",
+};
+
+const hiddenFileInputStyle = {
+    display: "none",
+};
+
+const uploadHintStyle = {
+    color: "#555",
+    fontSize: "0.95rem",
+    marginTop: "10px",
+    marginBottom: 0,
+};
+
+const fileListStyle = {
+    display: "flex",
+    flexDirection: "column" as const,
+    gap: "8px",
+    marginTop: "10px",
+};
+
+const fileItemStyle = {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: "12px",
+    padding: "8px 10px",
+    border: "1px solid #ddd",
+    borderRadius: "8px",
     color: "#555",
     fontSize: "0.9rem",
-    marginTop: "8px",
-    marginBottom: 0,
+};
+
+const removeFileButtonStyle = {
+    border: "none",
+    background: "#b00020",
+    color: "#fff",
+    borderRadius: "6px",
+    cursor: "pointer",
+    padding: "6px 10px",
+    flexShrink: 0,
 };
