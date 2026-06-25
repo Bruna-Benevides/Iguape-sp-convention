@@ -52,7 +52,7 @@ export default function Depoimentos() {
             <h1 style={styles.titulo}>Depoimentos</h1>
 
             <p style={styles.subtitulo}>
-                Veja experiências compartilhadas por visitantes de Iguape.
+                Veja experiências compartilhadas por visitantes de Iguape e também venha ver como esta sendo esse maravilhoso Congresso Internacional JW com o tema Felicidade Eterna que esta reunindo irmãos da região do vale do Ribeira e de todo mundo.
             </p>
 
             <div style={styles.buttonWrapper}>
