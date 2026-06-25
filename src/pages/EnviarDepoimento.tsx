@@ -58,7 +58,7 @@ export default function EnviarDepoimento() {
             }
 
             setMensagem(
-                "Depoimento enviado com sucesso! Aguardando aprovação."
+                "Depoimento enviado com sucesso! Seus comentários só serão visualizados na página do site após aprovação do administrador."
             );
 
             setNome("");

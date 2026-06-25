@@ -9,6 +9,7 @@ export default function Login() {
     const [senha, setSenha] = useState("");
     const [mensagem, setMensagem] = useState("");
     const [carregando, setCarregando] = useState(false);
+    const [mostrarAjudaCadastro, setMostrarAjudaCadastro] = useState(false);
     const location = useLocation();
     const from = location.state?.from || "/enviar-depoimento";
 
@@ -105,6 +106,35 @@ export default function Login() {
                     Criar conta
                 </button>
 
+                <div style={styles.helpWrapper}>
+                    <button
+                        type="button"
+                        style={styles.helpButton}
+                        aria-label="Ajuda para criar conta"
+                        onMouseEnter={() => setMostrarAjudaCadastro(true)}
+                        onMouseLeave={() => setMostrarAjudaCadastro(false)}
+                        onFocus={() => setMostrarAjudaCadastro(true)}
+                        onBlur={() => setMostrarAjudaCadastro(false)}
+                    >
+                        ?
+                    </button>
+                    <div
+                        style={{
+                            ...styles.helpTooltip,
+                            opacity: mostrarAjudaCadastro ? 1 : 0,
+                            visibility: mostrarAjudaCadastro ? "visible" : "hidden",
+                            transform: mostrarAjudaCadastro
+                                ? "translateY(0)"
+                                : "translateY(-4px)",
+                        }}
+                    >
+                        Para criar conta, informe um endereço de email válido,
+                        escolha uma senha e aperte Criar conta. Será enviado um
+                        email de confirmação; acesse seu email e confirme o
+                        cadastro antes de continuar o login.
+                    </div>
+                </div>
+
                 {/* <button onClick={entrarComGoogle} style={styles.botaoGoogle}>
                     Entrar com Google
                 </button> */}
@@ -182,6 +212,43 @@ const styles = {
         fontSize: "1rem",
         cursor: "pointer",
         marginBottom: "10px",
+    },
+    helpWrapper: {
+        position: "relative" as const,
+        display: "flex",
+        justifyContent: "flex-end",
+        marginTop: "-48px",
+        marginBottom: "22px",
+        paddingRight: "10px",
+    },
+    helpButton: {
+        width: "28px",
+        height: "28px",
+        borderRadius: "50%",
+        border: "1px solid #0c3d2e",
+        background: "#fff",
+        color: "#0c3d2e",
+        cursor: "help",
+        fontWeight: "bold",
+        fontSize: "0.95rem",
+        pointerEvents: "auto" as const,
+    },
+    helpTooltip: {
+        position: "absolute" as const,
+        right: "0",
+        top: "36px",
+        width: "280px",
+        maxWidth: "calc(100vw - 80px)",
+        background: "#0c3d2e",
+        color: "#fff",
+        padding: "12px",
+        borderRadius: "8px",
+        boxShadow: "0 4px 14px rgba(0,0,0,0.2)",
+        fontSize: "0.9rem",
+        lineHeight: "1.5",
+        textAlign: "left" as const,
+        transition: "opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease",
+        pointerEvents: "none" as const,
     },
 
     mensagem: {
