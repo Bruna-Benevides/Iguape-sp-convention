@@ -19,6 +19,18 @@ export default function EnviarDepoimento() {
             setCarregando(true);
             setMensagem("");
 
+            const formularioVazio =
+                !nome.trim() &&
+                !cidade.trim() &&
+                !comentario.trim() &&
+                fotos.length === 0 &&
+                videos.length === 0;
+
+            if (formularioVazio) {
+                setMensagem("Campo vazio. Preencha o formulário antes de enviar.");
+                return;
+            }
+
             const {
                 data: { user },
             } = await supabase.auth.getUser();
