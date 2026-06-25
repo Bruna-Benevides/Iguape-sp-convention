@@ -128,7 +128,7 @@ export default function Navbar() {
               Sair
             </button>
           ) : (
-            <NavLink to="/login">
+            <NavLink to="/login" onClick={fecharMenu}>
               Login
             </NavLink>
           )}
