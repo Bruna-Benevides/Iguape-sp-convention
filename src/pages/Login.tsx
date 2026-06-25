@@ -55,12 +55,17 @@ export default function Login() {
             return;
         }
 
+        setCarregando(true);
+        setMensagem("");
+
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
             redirectTo: `${window.location.origin}/redefinir-senha`,
         });
 
+        setCarregando(false);
+
         if (error) {
-            setMensagem("Erro ao enviar email de recuperação.");
+            setMensagem(`Erro ao enviar email de recuperação: ${error.message}`);
             return;
         }
 
@@ -106,13 +111,15 @@ export default function Login() {
 
                 <button
                     onClick={recuperarSenha}
+                    disabled={carregando}
                     style={{
                         background: "none",
                         border: "none",
                         color: "#0c3d2e",
-                        cursor: "pointer",
+                        cursor: carregando ? "default" : "pointer",
                         marginTop: "15px",
                         textDecoration: "underline",
+                        opacity: carregando ? 0.6 : 1,
                     }}
                 >
                     Esqueci minha senha
