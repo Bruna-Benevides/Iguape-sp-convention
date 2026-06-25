@@ -1,11 +1,47 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
+import { supabase } from "../services/supabase";
 import "./Navbar.css";
 
 const SITE_NAME = "Iguape"; // altere aqui para o nome desejado
 
 export default function Navbar() {
   const [menuAberto, setMenuAberto] = useState(false);
+  const [usuarioLogado, setUsuarioLogado] = useState(false);
+  const [emailUsuario, setEmailUsuario] = useState("");
+
+  useEffect(() => {
+    verificarUsuario();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUsuarioLogado(!!session);
+
+      if (session?.user?.email) {
+        setEmailUsuario(session.user.email);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  async function verificarUsuario() {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    setUsuarioLogado(!!session);
+
+    if (session?.user?.email) {
+      setEmailUsuario(session.user.email);
+    }
+  }
+
+  async function sair() {
+    await supabase.auth.signOut();
+    window.location.href = "/";
+  }
 
   function fecharMenu() {
     setMenuAberto(false);
@@ -60,6 +96,44 @@ export default function Navbar() {
         <NavLink to="/galeria" onClick={fecharMenu}>
           Galeria
         </NavLink>
+
+        <NavLink to="/depoimentos" onClick={fecharMenu}>
+          Depoimentos
+        </NavLink>
+
+        <>
+          {usuarioLogado && (
+            <span
+              style={{
+                color: "#d8e2c4",
+                fontSize: "0.85rem",
+              }}
+            >
+              {emailUsuario}
+            </span>
+          )}
+
+          {usuarioLogado ? (
+            <button
+              onClick={sair}
+              style={{
+                background: "transparent",
+                border: "none",
+                color: "white",
+                cursor: "pointer",
+                fontSize: "1rem",
+                fontWeight: "bold",
+              }}
+            >
+              Sair
+            </button>
+          ) : (
+            <NavLink to="/login">
+              Login
+            </NavLink>
+          )}
+        </>
+
       </div>
     </nav>
   );

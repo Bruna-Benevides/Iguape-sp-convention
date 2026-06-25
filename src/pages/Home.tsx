@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import Hero from "../components/Hero";
 // removed Firebase/Test components
 import faunaImg from "../assets/fauna/fauna-card.png";
@@ -5,6 +7,28 @@ import floraImg from "../assets/flora/flora-card.png";
 import gastroImg from "../assets/gastronomia/gastro-card.png";
 
 export default function Home() {
+    const [hoveredCard, setHoveredCard] = useState<number | null>(null);
+
+    const baseCardStyle = {
+        width: "300px",
+        padding: "20px",
+        borderRadius: "14px",
+        overflow: "hidden",
+        boxShadow: "0 0 10px rgba(0,0,0,0.1)",
+        textDecoration: "none",
+        color: "inherit",
+        transition: "transform 0.2s ease, box-shadow 0.2s ease",
+    } as const;
+
+    const getCardStyle = (index: number) => ({
+        ...baseCardStyle,
+        transform: hoveredCard === index ? "translateY(-6px) scale(1.02)" : "none",
+        boxShadow:
+            hoveredCard === index
+                ? "0 12px 30px rgba(0,0,0,0.18)"
+                : "0 0 10px rgba(0,0,0,0.1)",
+    });
+
     return (
         <>
             <Hero />
@@ -46,14 +70,11 @@ export default function Home() {
                     padding: "40px",
                 }}
             >
-                <div
-                    style={{
-                        width: "300px",
-                        padding: "20px",
-                        borderRadius: "14px",
-                        overflow: "hidden",
-                        boxShadow: "0 0 10px rgba(0,0,0,0.1)",
-                    }}
+                <Link
+                    to="/fauna"
+                    onMouseEnter={() => setHoveredCard(0)}
+                    onMouseLeave={() => setHoveredCard(null)}
+                    style={getCardStyle(0)}
                 >
                     <h3>Fauna</h3>
                     <img
@@ -73,16 +94,13 @@ export default function Home() {
                         típicas da Mata Atlântica e dos
                         manguezais do Vale do Ribeira.
                     </p>
-                </div>
+                </Link>
 
-                <div
-                    style={{
-                        width: "300px",
-                        padding: "20px",
-                        borderRadius: "14px",
-                        overflow: "hidden",
-                        boxShadow: "0 0 10px rgba(0,0,0,0.1)",
-                    }}
+                <Link
+                    to="/flora"
+                    onMouseEnter={() => setHoveredCard(1)}
+                    onMouseLeave={() => setHoveredCard(null)}
+                    style={getCardStyle(1)}
                 >
                     <h3>Flora</h3>
                     <img
@@ -101,16 +119,13 @@ export default function Home() {
                         Descubra a riqueza vegetal da Mata Atlântica,
                         um dos ecossistemas mais preservados do Brasil.
                     </p>
-                </div>
+                </Link>
 
-                <div
-                    style={{
-                        width: "300px",
-                        padding: "20px",
-                        borderRadius: "14px",
-                        overflow: "hidden",
-                        boxShadow: "0 0 10px rgba(0,0,0,0.1)",
-                    }}
+                <Link
+                    to="/gastronomia"
+                    onMouseEnter={() => setHoveredCard(2)}
+                    onMouseLeave={() => setHoveredCard(null)}
+                    style={getCardStyle(2)}
                 >
                     <h3>Gastronomia</h3>
                     <img
@@ -129,7 +144,7 @@ export default function Home() {
                       Conheça pratos tradicionais que refletem a cultura
                       caiçara e os sabores do Vale do Ribeira.
                     </p>
-                </div>
+                </Link>
             </section>
                 
         </>

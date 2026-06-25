@@ -8,6 +8,7 @@ import fauna6 from "../assets/fauna/lagarto.jpg";
 type Animal = {
   nome: string;
   imagem: string;
+  descricao: string;
 };
 
 export default function Fauna() {
@@ -15,26 +16,32 @@ export default function Fauna() {
     {
       nome: "Saruê",
       imagem: fauna1,
+      descricao: "O Saruê é um animal marsupial nativo muito comum na Mata Atlântica e no Vale do Ribeira. Inofensivo e de hábitos noturnos, ele é um grande aliado ecológico, alimentando-se de insetos, escorpiões, aranhas, cobras e carrapatos, além de dispersar sementes pela natureza.",
     },
     {
       nome: "Caranguejo-uçá",
       imagem: fauna2,
+      descricao: "O caranguejo-uçá ( Ucides cordatus ) é um crustáceo típico dos manguezais do Vale do Ribeira. Fundamental para o ecossistema local, ele recicla nutrientes e oxigênio ou apenas. É proibida sua captura em períodos de andada (reprodução) e durante a muda, sendo essenciais conformidades com as regras locais de pesca.",
     },
     {
       nome: "Quero-quero",
       imagem: fauna3,
+      descricao: "O quero-quero ( Vanellus chilensis ) é uma ave típica de campos abertos muito comum no Vale do Ribeira. Ele vive em pastagens, margens de rios, áreas alagadas e até gramados urbanos. É conhecido pelo seu comportamento vigilante e territorial, emitindo gritos altos para defender seu ninho feito no chão.",
     },
     {
       nome: "Guará-Vermelho",
       imagem: fauna4,
+      descricao: "O guará-vermelho (Eudocimus ruber) é uma ave símbolo dos manguezais, famosa por sua plumagem vermelho-vivo. No Vale do Ribeira, litoral de São Paulo, eles voltaram a ser vistos recentemente, colorindo áreas de mangue e estuários.",
     },
     {
       nome: "Jacaré-do-papo-amarelo",
       imagem: fauna5,
+      descricao: "O jacaré-de-papo-amarelo ( Caiman latirostris )é uma espécie nativa e muito importante nos ecossistemas da Mata Atlântica no Vale do Ribeira. Eles habitam rios, mangues e pântanos da região. Embora sejam predadores de topo, não costumam representar perigo aos humanos, sendo ariscos e fugindo quando avistados.",
     },
     {
       nome: "Lagarto",
       imagem: fauna6,
+      descricao: "O animal na imagem é olagarto-teiú(nome científico:Salvator merianae, anteriormenteTupinambis merianae), uma espécie nativa e muito comum em toda a região do Vale do Ribeira e no estado de São Paulo",
     },
   ];
 
@@ -116,8 +123,9 @@ export default function Fauna() {
               <h3 style={{ color: "#0c3d2e", marginBottom: "10px" }}>
                 {animal.nome}
               </h3>
-
-
+              <p style={{ margin: 0, marginTop: "10px", color: "#555", lineHeight: "1.6", fontSize: "0.95rem" }}>
+                {animal.descricao}
+              </p>
             </div>
           </div>
         ))}

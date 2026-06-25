@@ -29,7 +29,7 @@ export default function Hero() {
             marginBottom: "20px",
           }}
         >
-          Iguape
+          Bem-vindo a Iguape
         </h1>
 
         <p
