@@ -8,6 +8,8 @@ type Depoimento = {
     comentario: string;
     foto_url: string | null;
     video_url: string | null;
+    foto_urls: string[] | null;
+    video_urls: string[] | null;
     aprovado: boolean;
     created_at: string;
 };
@@ -44,24 +46,15 @@ export default function Admin() {
         if (!confirmar) return;
 
         try {
-            if (depoimento.foto_url) {
-                const caminhoFoto = depoimento.foto_url
-                    .split("/storage/v1/object/public/galeria/")
-                    .pop();
+            const caminhos = [
+                ...obterFotos(depoimento),
+                ...obterVideos(depoimento),
+            ]
+                .map(obterCaminhoStorage)
+                .filter((caminho): caminho is string => !!caminho);
 
-                if (caminhoFoto) {
-                    await supabase.storage.from("galeria").remove([caminhoFoto]);
-                }
-            }
-
-            if (depoimento.video_url) {
-                const caminhoVideo = depoimento.video_url
-                    .split("/storage/v1/object/public/galeria/")
-                    .pop();
-
-                if (caminhoVideo) {
-                    await supabase.storage.from("galeria").remove([caminhoVideo]);
-                }
+            if (caminhos.length > 0) {
+                await supabase.storage.from("galeria").remove(caminhos);
             }
 
             await supabase.from("depoimentos").delete().eq("id", depoimento.id);
@@ -122,19 +115,21 @@ export default function Admin() {
                         <p style={styles.cidade}>{item.cidade}</p>
                         <p style={styles.comentario}>“{item.comentario}”</p>
 
-                        {item.foto_url && (
+                        {obterFotos(item).map((foto, index) => (
                             <img
-                                src={item.foto_url}
-                                alt="Foto enviada"
+                                key={foto}
+                                src={foto}
+                                alt={`Foto enviada ${index + 1}`}
                                 style={styles.imagem}
                             />
-                        )}
+                        ))}
 
-                        {item.video_url && (
-                            <video controls style={styles.video}>
-                                <source src={item.video_url} type="video/mp4" />
+                        {obterVideos(item).map((video, index) => (
+                            <video key={video} controls style={styles.video}>
+                                <source src={video} type="video/mp4" />
+                                Vídeo enviado {index + 1}
                             </video>
-                        )}
+                        ))}
 
                         {!item.aprovado && (
                             <button
@@ -156,6 +151,26 @@ export default function Admin() {
             </div>
         </section>
     );
+}
+
+function obterFotos(depoimento: Depoimento) {
+    return depoimento.foto_urls?.length
+        ? depoimento.foto_urls
+        : depoimento.foto_url
+            ? [depoimento.foto_url]
+            : [];
+}
+
+function obterVideos(depoimento: Depoimento) {
+    return depoimento.video_urls?.length
+        ? depoimento.video_urls
+        : depoimento.video_url
+            ? [depoimento.video_url]
+            : [];
+}
+
+function obterCaminhoStorage(url: string) {
+    return url.split("/storage/v1/object/public/galeria/").pop();
 }
 
 const styles = {

@@ -61,8 +61,18 @@ type MidiaVisitante = {
   id: string;
   nome: string;
   cidade: string;
+  url: string;
+  tipo: "foto" | "video";
+};
+
+type DepoimentoVisitante = {
+  id: string;
+  nome: string;
+  cidade: string;
   foto_url: string | null;
   video_url: string | null;
+  foto_urls: string[] | null;
+  video_urls: string[] | null;
 };
 
 export default function Galeria() {
@@ -89,13 +99,12 @@ export default function Galeria() {
   async function buscarMidiasVisitantes() {
     const { data, error } = await supabase
       .from("depoimentos")
-      .select("id, nome, cidade, foto_url, video_url")
+      .select("id, nome, cidade, foto_url, video_url, foto_urls, video_urls")
       .eq("aprovado", true)
-      .or("foto_url.not.is.null,video_url.not.is.null")
       .order("created_at", { ascending: false });
 
     if (!error && data) {
-      setMidiasVisitantes(data);
+      setMidiasVisitantes(criarListaDeMidias(data));
     }
   }
 
@@ -269,28 +278,28 @@ export default function Galeria() {
             </button>
 
             <div style={styles.uploadCard}>
-              {midiasVisitantes[envioAtual].foto_url && (
+              {midiasVisitantes[envioAtual].tipo === "foto" && (
                 <img
-                  src={midiasVisitantes[envioAtual].foto_url || ""}
+                  src={midiasVisitantes[envioAtual].url}
                   alt={midiasVisitantes[envioAtual].nome}
                   style={styles.uploadImagem}
                   onClick={() =>
                     abrirModal(
-                      midiasVisitantes[envioAtual].foto_url || "",
+                      midiasVisitantes[envioAtual].url,
                       0
                     )
                   }
                 />
               )}
 
-              {midiasVisitantes[envioAtual].video_url && (
+              {midiasVisitantes[envioAtual].tipo === "video" && (
                 <video
                   controls
                   style={styles.uploadVideo}
                   onPlay={(event) => pausarOutrosVideos(event.currentTarget)}
                 >
                   <source
-                    src={midiasVisitantes[envioAtual].video_url || ""}
+                    src={midiasVisitantes[envioAtual].url}
                     type="video/mp4"
                   />
                 </video>
@@ -349,6 +358,39 @@ export default function Galeria() {
       )}
     </div>
   );
+}
+
+function criarListaDeMidias(depoimentos: DepoimentoVisitante[]) {
+  return depoimentos.flatMap((depoimento) => {
+    const fotos = depoimento.foto_urls?.length
+      ? depoimento.foto_urls
+      : depoimento.foto_url
+        ? [depoimento.foto_url]
+        : [];
+
+    const videos = depoimento.video_urls?.length
+      ? depoimento.video_urls
+      : depoimento.video_url
+        ? [depoimento.video_url]
+        : [];
+
+    return [
+      ...fotos.map((url, index) => ({
+        id: `${depoimento.id}-foto-${index}`,
+        nome: depoimento.nome,
+        cidade: depoimento.cidade,
+        url,
+        tipo: "foto" as const,
+      })),
+      ...videos.map((url, index) => ({
+        id: `${depoimento.id}-video-${index}`,
+        nome: depoimento.nome,
+        cidade: depoimento.cidade,
+        url,
+        tipo: "video" as const,
+      })),
+    ];
+  });
 }
 
 const styles = {

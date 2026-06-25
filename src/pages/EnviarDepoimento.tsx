@@ -6,8 +6,8 @@ export default function EnviarDepoimento() {
     const [cidade, setCidade] = useState("");
     const [comentario, setComentario] = useState("");
 
-    const [foto, setFoto] = useState<File | null>(null);
-    const [video, setVideo] = useState<File | null>(null);
+    const [fotos, setFotos] = useState<File[]>([]);
+    const [videos, setVideos] = useState<File[]>([]);
 
     const [mensagem, setMensagem] = useState("");
     const [carregando, setCarregando] = useState(false);
@@ -26,41 +26,12 @@ export default function EnviarDepoimento() {
                 return;
             }
 
-            let fotoUrl = "";
-            let videoUrl = "";
+            const fotoUrls = await enviarArquivos(fotos, "fotos");
+            const videoUrls = await enviarArquivos(videos, "videos");
 
-            // Upload da foto
-            if (foto) {
-                const nomeArquivo = `${Date.now()}-${foto.name}`;
-
-                const { error } = await supabase.storage
-                    .from("galeria")
-                    .upload(`fotos/${nomeArquivo}`, foto);
-
-                if (!error) {
-                    const { data } = supabase.storage
-                        .from("galeria")
-                        .getPublicUrl(`fotos/${nomeArquivo}`);
-
-                    fotoUrl = data.publicUrl;
-                }
-            }
-
-            // Upload do vídeo
-            if (video) {
-                const nomeArquivo = `${Date.now()}-${video.name}`;
-
-                const { error } = await supabase.storage
-                    .from("galeria")
-                    .upload(`videos/${nomeArquivo}`, video);
-
-                if (!error) {
-                    const { data } = supabase.storage
-                        .from("galeria")
-                        .getPublicUrl(`videos/${nomeArquivo}`);
-
-                    videoUrl = data.publicUrl;
-                }
+            if (fotoUrls.length !== fotos.length || videoUrls.length !== videos.length) {
+                setMensagem("Alguns arquivos não puderam ser enviados. Tente novamente.");
+                return;
             }
 
             const { error } = await supabase
@@ -70,8 +41,10 @@ export default function EnviarDepoimento() {
                         nome,
                         cidade,
                         comentario,
-                        foto_url: fotoUrl,
-                        video_url: videoUrl,
+                        foto_url: fotoUrls[0] || "",
+                        video_url: videoUrls[0] || "",
+                        foto_urls: fotoUrls,
+                        video_urls: videoUrls,
                         user_id: user.id,
                         aprovado: false,
                     },
@@ -89,14 +62,39 @@ export default function EnviarDepoimento() {
             setNome("");
             setCidade("");
             setComentario("");
-            setFoto(null);
-            setVideo(null);
+            setFotos([]);
+            setVideos([]);
         } catch (erro) {
             console.error(erro);
             setMensagem("Erro ao enviar depoimento.");
         } finally {
             setCarregando(false);
         }
+    }
+
+    async function enviarArquivos(arquivos: File[], pasta: "fotos" | "videos") {
+        const urls: string[] = [];
+
+        for (const arquivo of arquivos) {
+            const nomeArquivo = `${Date.now()}-${crypto.randomUUID()}-${arquivo.name}`;
+            const caminho = `${pasta}/${nomeArquivo}`;
+
+            const { error } = await supabase.storage
+                .from("galeria")
+                .upload(caminho, arquivo);
+
+            if (error) {
+                continue;
+            }
+
+            const { data } = supabase.storage
+                .from("galeria")
+                .getPublicUrl(caminho);
+
+            urls.push(data.publicUrl);
+        }
+
+        return urls;
     }
 
     return (
@@ -154,30 +152,38 @@ export default function EnviarDepoimento() {
 
                 <div style={{ marginBottom: "15px" }}>
                     <label>
-                        <strong>Enviar foto:</strong>
+                        <strong>Enviar fotos:</strong>
                     </label>
 
                     <input
                         type="file"
                         accept="image/*"
+                        multiple
                         onChange={(e) =>
-                            setFoto(e.target.files?.[0] || null)
+                            setFotos(Array.from(e.target.files || []))
                         }
                     />
+                    {fotos.length > 0 && (
+                        <p style={fileInfoStyle}>{fotos.length} foto(s) selecionada(s)</p>
+                    )}
                 </div>
 
                 <div style={{ marginBottom: "25px" }}>
                     <label>
-                        <strong>Enviar vídeo:</strong>
+                        <strong>Enviar vídeos:</strong>
                     </label>
 
                     <input
                         type="file"
                         accept="video/*"
+                        multiple
                         onChange={(e) =>
-                            setVideo(e.target.files?.[0] || null)
+                            setVideos(Array.from(e.target.files || []))
                         }
                     />
+                    {videos.length > 0 && (
+                        <p style={fileInfoStyle}>{videos.length} vídeo(s) selecionado(s)</p>
+                    )}
                 </div>
 
                 <button
@@ -222,4 +228,11 @@ const inputStyle = {
     border: "1px solid #ccc",
     fontSize: "1rem",
     boxSizing: "border-box" as const,
+};
+
+const fileInfoStyle = {
+    color: "#555",
+    fontSize: "0.9rem",
+    marginTop: "8px",
+    marginBottom: 0,
 };

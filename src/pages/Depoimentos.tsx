@@ -9,6 +9,8 @@ type Depoimento = {
     comentario: string;
     foto_url: string | null;
     video_url: string | null;
+    foto_urls: string[] | null;
+    video_urls: string[] | null;
     created_at: string;
 };
 
@@ -21,18 +23,20 @@ export default function Depoimentos() {
     }, []);
     const totalDepoimentos = depoimentos.length;
 
-    const totalFotos = depoimentos.filter(
-        (item) => item.foto_url
-    ).length;
+    const totalFotos = depoimentos.reduce(
+        (total, item) => total + obterFotos(item).length,
+        0
+    );
 
-    const totalVideos = depoimentos.filter(
-        (item) => item.video_url
-    ).length;
+    const totalVideos = depoimentos.reduce(
+        (total, item) => total + obterVideos(item).length,
+        0
+    );
 
     async function buscarDepoimentos() {
         const { data, error } = await supabase
             .from("depoimentos")
-            .select("id, nome, cidade, comentario, foto_url, video_url, created_at")
+            .select("id, nome, cidade, comentario, foto_url, video_url, foto_urls, video_urls, created_at")
             .eq("aprovado", true)
             .order("created_at", { ascending: false });
 
@@ -72,26 +76,51 @@ export default function Depoimentos() {
             )}
 
             <div style={styles.cards}>
-                {depoimentos.map((item) => (
-                    <div key={item.id} style={styles.card}>
-                        {item.foto_url && (
-                            <img
-                                src={item.foto_url}
-                                alt={`Foto enviada por ${item.nome}`}
-                                style={styles.imagem}
-                            />
-                        )}
+                {depoimentos.map((item) => {
+                    const fotos = obterFotos(item);
+                    const videos = obterVideos(item);
 
-                        <p style={styles.comentario}>“{item.comentario}”</p>
+                    return (
+                        <div key={item.id} style={styles.card}>
+                            {fotos.length > 0 && (
+                                <div style={styles.mediaGrid}>
+                                    {fotos.map((foto, index) => (
+                                        <img
+                                            key={foto}
+                                            src={foto}
+                                            alt={`Foto ${index + 1} enviada por ${item.nome}`}
+                                            style={styles.imagem}
+                                        />
+                                    ))}
+                                </div>
+                            )}
 
-                        <h3 style={styles.nome}>{item.nome}</h3>
+                            {videos.map((video, index) => (
+                                <video key={video} controls style={styles.video}>
+                                    <source src={video} type="video/mp4" />
+                                    Vídeo {index + 1}
+                                </video>
+                            ))}
 
-                        <span style={styles.cidade}>{item.cidade}</span>
-                    </div>
-                ))}
+                            <p style={styles.comentario}>“{item.comentario}”</p>
+
+                            <h3 style={styles.nome}>{item.nome}</h3>
+
+                            <span style={styles.cidade}>{item.cidade}</span>
+                        </div>
+                    );
+                })}
             </div>
         </section>
     );
+}
+
+function obterFotos(item: Depoimento) {
+    return item.foto_urls?.length ? item.foto_urls : item.foto_url ? [item.foto_url] : [];
+}
+
+function obterVideos(item: Depoimento) {
+    return item.video_urls?.length ? item.video_urls : item.video_url ? [item.video_url] : [];
 }
 
 const styles = {
@@ -133,6 +162,17 @@ const styles = {
         width: "100%",
         height: "180px",
         objectFit: "cover" as const,
+        borderRadius: "10px",
+        marginBottom: "15px",
+    },
+    mediaGrid: {
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))",
+        gap: "10px",
+        marginBottom: "15px",
+    },
+    video: {
+        width: "100%",
         borderRadius: "10px",
         marginBottom: "15px",
     },
