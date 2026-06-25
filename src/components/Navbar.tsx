@@ -7,6 +7,7 @@ const SITE_NAME = "Iguape"; // altere aqui para o nome desejado
 
 export default function Navbar() {
   const [menuAberto, setMenuAberto] = useState(false);
+  const [logoAberto, setLogoAberto] = useState(false);
   const [usuarioLogado, setUsuarioLogado] = useState(false);
   const [emailUsuario, setEmailUsuario] = useState("");
 
@@ -48,93 +49,124 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="navbar">
-      <div className="navbar-logo">
-        <span className="logo-icon" aria-hidden>
-          <img src="/logo-iguape.ico" alt="logo-iguape" />
-        </span>
-        <span className="logo-text">{SITE_NAME}</span>
-      </div>
-
-      <button
-        className="menu-button"
-        onClick={() => setMenuAberto(true)}
-        aria-label="Abrir menu"
-      >
-        ☰
-      </button>
-
-      <div className={`nav-links ${menuAberto ? "ativo" : ""}`}>
+    <>
+      <nav className="navbar">
         <button
-          className="close-button"
-          onClick={fecharMenu}
-          aria-label="Fechar menu"
+          type="button"
+          className="navbar-logo"
+          onClick={() => setLogoAberto(true)}
+          aria-label="Ver logo de Iguape ampliado"
         >
-          ×
+          <span className="logo-icon" aria-hidden>
+            <img src="/logo-iguape.ico" alt="" />
+          </span>
+          <span className="logo-text">{SITE_NAME}</span>
         </button>
 
-        <NavLink to="/" onClick={fecharMenu}>
-          Home
-        </NavLink>
+        <button
+          className="menu-button"
+          onClick={() => setMenuAberto(true)}
+          aria-label="Abrir menu"
+        >
+          ☰
+        </button>
 
-        <NavLink to="/sobre" onClick={fecharMenu}>
-          Sobre
-        </NavLink>
+        <div className={`nav-links ${menuAberto ? "ativo" : ""}`}>
+          <button
+            className="close-button"
+            onClick={fecharMenu}
+            aria-label="Fechar menu"
+          >
+            ×
+          </button>
 
-        <NavLink to="/fauna" onClick={fecharMenu}>
-          Fauna
-        </NavLink>
+          <NavLink to="/" onClick={fecharMenu}>
+            Home
+          </NavLink>
 
-        <NavLink to="/flora" onClick={fecharMenu}>
-          Flora
-        </NavLink>
+          <NavLink to="/sobre" onClick={fecharMenu}>
+            Sobre
+          </NavLink>
 
-        <NavLink to="/gastronomia" onClick={fecharMenu}>
-          Gastronomia
-        </NavLink>
+          <NavLink to="/fauna" onClick={fecharMenu}>
+            Fauna
+          </NavLink>
 
-        <NavLink to="/galeria" onClick={fecharMenu}>
-          Galeria
-        </NavLink>
+          <NavLink to="/flora" onClick={fecharMenu}>
+            Flora
+          </NavLink>
 
-        <NavLink to="/depoimentos" onClick={fecharMenu}>
-          Depoimentos
-        </NavLink>
+          <NavLink to="/gastronomia" onClick={fecharMenu}>
+            Gastronomia
+          </NavLink>
 
-        <>
-          {usuarioLogado && (
-            <span
-              style={{
-                color: "#d8e2c4",
-                fontSize: "0.85rem",
-              }}
-            >
-              {emailUsuario}
-            </span>
-          )}
+          <NavLink to="/galeria" onClick={fecharMenu}>
+            Galeria
+          </NavLink>
 
-          {usuarioLogado ? (
-            <button
-              onClick={sair}
-              style={{
-                background: "transparent",
-                border: "none",
-                color: "white",
-                cursor: "pointer",
-                fontSize: "1rem",
-                fontWeight: "bold",
-              }}
-            >
-              Sair
-            </button>
-          ) : (
-            <NavLink to="/login" onClick={fecharMenu}>
-              Login
-            </NavLink>
-          )}
-        </>
+          <NavLink to="/depoimentos" onClick={fecharMenu}>
+            Depoimentos
+          </NavLink>
 
-      </div>
-    </nav>
+          <>
+            {usuarioLogado && (
+              <span
+                style={{
+                  color: "#d8e2c4",
+                  fontSize: "0.85rem",
+                }}
+              >
+                {emailUsuario}
+              </span>
+            )}
+
+            {usuarioLogado ? (
+              <button
+                onClick={sair}
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  color: "white",
+                  cursor: "pointer",
+                  fontSize: "1rem",
+                  fontWeight: "bold",
+                }}
+              >
+                Sair
+              </button>
+            ) : (
+              <NavLink to="/login" onClick={fecharMenu}>
+                Login
+              </NavLink>
+            )}
+          </>
+
+        </div>
+      </nav>
+
+      {logoAberto && (
+        <div
+          className="logo-modal"
+          onClick={() => setLogoAberto(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Logo de Iguape ampliado"
+        >
+          <button
+            className="logo-modal-close"
+            onClick={() => setLogoAberto(false)}
+            aria-label="Fechar logo ampliado"
+          >
+            ×
+          </button>
+          <img
+            src="/logo-iguape.ico"
+            alt="Logo de Iguape"
+            className="logo-modal-image"
+            onClick={(event) => event.stopPropagation()}
+          />
+        </div>
+      )}
+    </>
   );
 }

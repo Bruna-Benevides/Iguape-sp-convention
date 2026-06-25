@@ -19,6 +19,9 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 14px;
+  background: transparent;
+  border: none;
+  padding: 0;
 }
 
 .navbar-logo,
@@ -35,8 +38,8 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 54px;
-  height: 54px;
+  width: 66px;
+  height: 66px;
 }
 
 .logo-icon img {
@@ -48,6 +51,39 @@ body {
  
 
 .logo-text {
+  line-height: 1;
+}
+
+.logo-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.78);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 4000;
+}
+
+.logo-modal-image {
+  width: min(360px, 78vw);
+  height: auto;
+  object-fit: contain;
+  background: #fff;
+  border-radius: 12px;
+  padding: 18px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+}
+
+.logo-modal-close {
+  position: absolute;
+  top: 22px;
+  right: 28px;
+  background: transparent;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 3rem;
   line-height: 1;
 }
 
@@ -138,8 +174,8 @@ body {
   }
 
   .logo-icon {
-    width: 58px;
-    height: 58px;
+    width: 64px;
+    height: 64px;
   }
 
 }
